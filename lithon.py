@@ -2,7 +2,7 @@
 
 from codetalker.pgm import Grammar, Translator
 from codetalker.pgm.special import star, plus, _or, commas
-from codetalker.pgm.tokens import ID, STRING, NUMBER, EOF, NEWLINE, WHITE, ReToken, re, CharToken, StringToken
+from codetalker.pgm.tokens import STRING, NUMBER, EOF, NEWLINE, WHITE, ReToken, re, CharToken, StringToken
 
 import os,sys
 import re
@@ -19,6 +19,9 @@ class SYMBOL(CharToken):
   chars = '\'()[]'
   num = 5
   
+class ID(ReToken):
+  rx = re.compile("[a-zA-Z\+\-\*\/\=][a-zA-Z\=]*")
+  
 class BOOL(StringToken):
   strings = ['#t','#f']
   
@@ -30,7 +33,7 @@ def program(rule):
 program.astName = 'Program'
 
 def expression(rule):
-  rule | quote | define | defvar | sexp | ID | STRING | NUMBER | BOOL
+  rule | quote | define | defvar | anon | sexp | ID | STRING | NUMBER | BOOL
   rule.pass_single = True  
   
 def quote(rule):
@@ -44,12 +47,17 @@ def define(rule):
 define.astName = 'Define'
 
 def defvar(rule):
-  rule | ('(','def',ID,expression,')')
+  rule | ('(','define',ID,expression,')')
   rule.astAttrs = {'ident': [ID], 'val': expression}
 defvar.astName = 'Defvar'
 
+def anon(rule):
+  rule | ('(','lambda','(',star(ID),')',expression,')')
+  rule.astAttrs = {'args': [ID], 'body': expression}
+anon.astName = 'Anon'
+
 def sexp(rule):
-  rule | ('(',ID,star(expression),')')
+  rule | ('(',ID,star(expression),')') | ('(',star(expression),')')
   rule.astAttrs = {'function': ID, 'args': [expression]}
 sexp.astName = 'Sexp'
 
@@ -70,7 +78,7 @@ def t_program(node):
   
 @Lithon.translates(ast.Quote)
 def t_quote(node):
-  return nodes.Quote([Lithon.translate(e) for e in node.values])
+  return nodes.Quote([Lithon.translate(v) for v in node.values])
   
 @Lithon.translates(ast.Define)
 def t_define(node):
@@ -79,6 +87,10 @@ def t_define(node):
 @Lithon.translates(ast.Defvar)
 def t_defvar(node):
   return nodes.Defvar(node.ident[1],Lithon.translate(node.val))
+  
+@Lithon.translates(ast.Anon)
+def t_anon(node):
+  return nodes.Anon(node.args[1:],Lithon.translate(node.body))
 
 @Lithon.translates(ast.Sexp)
 def t_sexp(node):

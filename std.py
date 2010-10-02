@@ -1,5 +1,5 @@
 def add(*args):
-  return sum(args)
+  return reduce(lambda x,y: x+y,args)
   
 def sub(*args):
   return reduce(lambda x,y: x-y,args)
