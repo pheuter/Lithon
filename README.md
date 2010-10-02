@@ -8,7 +8,7 @@ Make sure you have *Python* installed on your system as well as the [CodeTalker]
   
 ## Usage
 
-To compile a file: ``./lithon.py test/factorial.lith``
+To compile a file: ``./lithon.py tests/factorial.lith``
   
 ## Help
 
