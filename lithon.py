@@ -20,7 +20,7 @@ class SYMBOL(CharToken):
   num = 5
   
 class ID(ReToken):
-  rx = re.compile("[a-zA-Z\+\-\*\/\=][a-zA-Z\=]*")
+  rx = re.compile("[a-zA-Z\_\+\-\*\/\=\<\>]*")
   
 class BOOL(StringToken):
   strings = ['#t','#f']
@@ -33,7 +33,7 @@ def program(rule):
 program.astName = 'Program'
 
 def expression(rule):
-  rule | quote | define | defvar | anon | sexp | ID | STRING | NUMBER | BOOL
+  rule | quote | define | defvar | anon | if_ | sexp | ID | STRING | NUMBER | BOOL
   rule.pass_single = True  
   
 def quote(rule):
@@ -55,6 +55,11 @@ def anon(rule):
   rule | ('(','lambda','(',star(ID),')',expression,')')
   rule.astAttrs = {'args': [ID], 'body': expression}
 anon.astName = 'Anon'
+
+def if_(rule):
+  rule | ('(','if',expression,expression,expression,')')
+  rule.astAttrs = {'expressions':[expression]}
+if_.astName = 'If'
 
 def sexp(rule):
   rule | ('(',ID,star(expression),')') | ('(',star(expression),')')
@@ -91,6 +96,10 @@ def t_defvar(node):
 @Lithon.translates(ast.Anon)
 def t_anon(node):
   return nodes.Anon(node.args[1:],Lithon.translate(node.body))
+  
+@Lithon.translates(ast.If)
+def t_if(node):
+  return nodes.If([Lithon.translate(e) for e in node.expressions])
 
 @Lithon.translates(ast.Sexp)
 def t_sexp(node):
@@ -114,13 +123,14 @@ def t_bool(node):
   
 input_file = sys.argv[1]
 output_file = re.match("(.+)\.",sys.argv[1]).group()+"py"
+
 Lithon.from_string(open(input_file,'r').read())
-print "Visited all elements, now compiling to python"
 f = open(output_file,'w')
 f.write("# std start\n")
 f.write(file("std.py").read())
 f.write("\n# std end\n\n")
 for e in elements:
+  print "VISITING: %s" % e.__class__
   f.write(str(e)+'\n')
 f.close()
 print "Compiled!"
