@@ -1,5 +1,7 @@
 # Lithon
 
+![Lithon Logo](http://cl.ly/8b1646a821a00b4c6966/content)
+
 A toy compiler that translates from a small subset of Scheme into Python.
 
 ## Requirements
