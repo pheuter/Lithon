@@ -1,4 +1,7 @@
-(if
-  ((+ 1 2) <= 3)
-  (print "3 <= 3")
-  (print "oops"))
+(define answer
+  (if
+    ((+ 1 2) <= 3)
+    "3 <= 3"
+    "oops"))
+    
+(print answer)

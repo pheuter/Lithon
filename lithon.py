@@ -42,7 +42,7 @@ def quote(rule):
 quote.astName = 'Quote'
   
 def define(rule):
-  rule | ('(','define',ID,'(',star(ID),')',plus(expression),')')
+  rule | ('(','define','(',ID,star(ID),')',plus(expression),')')
   rule.astAttrs = {'args': [ID], 'body': [expression]}
 define.astName = 'Define'
 
