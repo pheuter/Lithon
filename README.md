@@ -6,7 +6,7 @@ A toy compiler that translates from a small subset of Scheme into Python.
 
 ## Requirements
 
-Make sure you have *Python* installed on your system as well as the [CodeTalker](http://jaredforsyth.com/projects/codetalker/) library
+Make sure you have *Python (2.7)* installed on your system as well as the [CodeTalker](http://jaredforsyth.com/projects/codetalker/) library
   
 ## Usage
 

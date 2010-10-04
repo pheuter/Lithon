@@ -1,3 +1,4 @@
+from fractions import Fraction
 indent_counter = 0; # For maintaining indents
 def repeat(object, times=None): # For creating arbitrary amount of indents
     # repeat(10, 3) --> 10 10 10
@@ -78,10 +79,10 @@ class Sexp():
     elif (f == "filter"):
       if (self.args[0].__class__ == Anon): return "[%s for %s in %s if %s]" % (self.args[0].args[0],self.args[0].args[0],self.args[1],self.args[0].body)
       else: return "[x for x in %s if %s(x)]" % (self.args[1],self.args[0])
-    elif (f == "+"): return "%s" % "+".join([str(a) for a in self.args])
-    elif (f == "-"): return "%s" % "-".join([str(a) for a in self.args])
-    elif (f == "*"): return "%s" % "*".join([str(a) for a in self.args])
-    elif (f == "/"): return "%s" % "/".join([str(a) for a in self.args])
+    elif (f == "+"): return "(%s)" % "+".join([str(a) for a in self.args])
+    elif (f == "-"): return "(%s)" % "-".join([str(a) for a in self.args])
+    elif (f == "*"): return "(%s)" % "*".join([str(a) for a in self.args])
+    elif (f == "/"): return "Fraction(\"%s\")" % reduce(Fraction,[int(str(a)) for a in self.args])
     elif (f == "="): return "%s == %s" % (self.args[0], self.args[1])
     elif (f == "<"): return "%s < %s" % (self.args[0], self.args[1])
     elif (f == "<="): return "%s <= %s" % (self.args[0], self.args[1])

@@ -126,6 +126,7 @@ output_file = re.match("(.+)\.",sys.argv[1]).group()+"py"
 
 Lithon.from_string(open(input_file,'r').read())
 f = open(output_file,'w')
+f.write("from fractions import Fraction # Might eventually be optional\n\n") 
 for e in elements:
   print "VISITING: %s" % e.__class__
   f.write(str(e)+'\n')
