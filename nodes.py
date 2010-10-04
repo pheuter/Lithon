@@ -69,32 +69,30 @@ class Sexp():
   def __init__(self, function,args):
     self.function = function
     self.args = args
-    try:
-      self.opts = {
-        "map": "[%s(x) for x in %s]" % (self.args[0],self.args[1]),
-        "map_anon": "[(%s)(x) for x in %s]" % (self.args[0],self.args[1]),
-        "filter": "[x for x in %s if %s(x)]" % (self.args[1],self.args[0]),
-        "filter_anon": "[x for x in %s if (%s)(x)]" % (self.args[1],self.args[0]),
-        "+": "add(%s)" % ", ".join([str(a) for a in self.args]),
-        "-": "sub(%s)" % ", ".join([str(a) for a in self.args]),
-        "*": "mult(%s)" % ", ".join([str(a) for a in self.args]),
-        "/": "add(%s)" % ", ".join([str(a) for a in self.args]),
-        "=": "%s == %s" % (self.args[0], self.args[1]),
-        "<": "%s < %s" % (self.args[0], self.args[1]),
-        "<=": "%s <= %s" % (self.args[0], self.args[1]),
-        ">": "%s > %s" % (self.args[0], self.args[1]),
-        ">=": "%s >= %s" % (self.args[0], self.args[1])
-      }
-    except: # We wont always have these conditions
-      pass
       
+  def optimize(self):
+    f = str(self.function)
+    if (f == "map"): 
+      if (self.args[0].__class__ == Anon): return "[%s for %s in %s]" % (self.args[0].body,str(self.args[0].args[0]),self.args[1])
+      else: return "[%s(x) for x in %s]" % (self.args[0],self.args[1])
+    elif (f == "filter"):
+      if (self.args[0].__class__ == Anon): return "[%s for %s in %s if %s]" % (self.args[0].args[0],self.args[0].args[0],self.args[1],self.args[0].body)
+      else: return "[x for x in %s if %s(x)]" % (self.args[1],self.args[0])
+    elif (f == "+"): return "%s" % "+".join([str(a) for a in self.args])
+    elif (f == "-"): return "%s" % "-".join([str(a) for a in self.args])
+    elif (f == "*"): return "%s" % "*".join([str(a) for a in self.args])
+    elif (f == "/"): return "%s" % "/".join([str(a) for a in self.args])
+    elif (f == "="): return "%s == %s" % (self.args[0], self.args[1])
+    elif (f == "<"): return "%s < %s" % (self.args[0], self.args[1])
+    elif (f == "<="): return "%s <= %s" % (self.args[0], self.args[1])
+    elif (f == ">"): return "%s > %s" % (self.args[0], self.args[1])
+    elif (f == ">="): return "%s >= %s" % (self.args[0], self.args[1])
+    else: return None  
+    
   def __str__(self):
     if self.function:
-      try:
-        if (self.args[0].__class__ == Anon): return self.opts[str(self.function)+"_anon"]
-        else: return self.opts[str(self.function)]
-      except:
-        return "%s(%s)" % (self.function,", ".join([str(a) for a in self.args])) # regular function call
+      opt = self.optimize()
+      return opt if opt else "%s(%s)" % (self.function,", ".join([str(a) for a in self.args])) # regular function call
     elif (self.args[0].__class__ == Anon):
       return "(%s)(%s)" % (str(self.args[0]),", ".join([str(a) for a in self.args][1:])) # anonymous function call
     else:
