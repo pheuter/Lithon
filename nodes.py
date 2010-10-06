@@ -23,11 +23,14 @@ class Define():
     self.body = body
 
   def __str__(self):
+    print "body: %s" % self.body
     global indent_counter
     indent_counter += 1
     indents = ""
     for i in repeat("\t",indent_counter): indents += i
-    out = "def %s(%s):\n%s%s\n" % (str(self.ident),", ".join([str(a) for a in self.args]),indents,"\n%s".join([str(exp) for exp in self.body]))
+    if (self.body[-1].__class__ == If): ret = "%s if %s else %s" % (self.body[-1].expressions[1], self.body[-1].expressions[0],self.body[-1].expressions[2]) # broken for functions where last statement consists of nested ifs, for now
+    else: ret = str(self.body[-1])
+    out = "def %s(%s):\n%s%s\n\treturn %s\n" % (str(self.ident),", ".join([str(a) for a in self.args]),indents,"\n\t".join([str(exp) for exp in self.body][:-1]),ret)
     indent_counter -= 1
     return out
 
