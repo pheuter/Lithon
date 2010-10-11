@@ -129,7 +129,7 @@ f = open(output_file,'w')
 f.write("from fractions import Fraction # Might eventually be optional\n\n") 
 for e in elements:
   print "VISITING: %s" % e.__class__
-  f.write(str(e)+'\n')
+  f.write("print %s\n" % e) if (e.__class__ == nodes.Sexp or e.__class__ == nodes.Id) else f.write("%s\n" % e)
 f.close()
 print "Compiled!"
 print "Executing %s ..." % output_file

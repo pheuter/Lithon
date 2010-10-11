@@ -4,4 +4,4 @@
     "3 <= 3"
     "oops"))
     
-(print answer)
+answer
