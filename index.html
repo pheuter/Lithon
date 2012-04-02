@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Lithon by pheuter</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Lithon</h1>
+        <p>A toy compiler that translates a small subset of Scheme into Python</p>
+        <p class="view"><a href="https://github.com/pheuter/Lithon">View the Project on GitHub <small>pheuter/Lithon</small></a></p>
+        <ul>
+          <li><a href="https://github.com/pheuter/Lithon/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/pheuter/Lithon/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/pheuter/Lithon">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>Lithon</h3>
+
+<p><strong>Lithon</strong> is a toy compiler that translates a small subset of Scheme into Python. It implements the <a href="http://jaredforsyth.com/projects/codetalker/">CodeTalker</a> compiler compiler.</p>
+
+<p>Let's say we want to compile the following Scheme into Python:</p>
+
+<div class="highlight">
+<pre><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">factorial_rec</span> <span class="nv">n</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">n</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="mi">1</span>
+      <span class="p">(</span><span class="nb">* </span><span class="nv">n</span> <span class="p">(</span><span class="nf">factorial_rec</span> <span class="p">(</span><span class="nb">- </span><span class="nv">n</span> <span class="mi">1</span><span class="p">)))))</span>
+
+<span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">factorial_iter</span> <span class="nv">n</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">reduce</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span> <span class="nv">y</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">x</span> <span class="nv">y</span><span class="p">))</span> <span class="p">(</span><span class="nf">xrange</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">+ </span><span class="mi">1</span> <span class="nv">n</span><span class="p">))))</span>
+
+<span class="p">(</span><span class="nb">map </span><span class="nv">factorial_rec</span> <span class="p">(</span><span class="nf">xrange</span> <span class="mi">1</span> <span class="mi">11</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">map </span><span class="nv">factorial_iter</span> <span class="p">(</span><span class="nf">xrange</span> <span class="mi">11</span> <span class="mi">16</span><span class="p">))</span>
+</pre>
+</div>
+
+
+<p>We simply write the code to a file and pass it to <strong>lithon.py</strong>:</p>
+
+<div class="highlight">
+<pre><span class="nv">$ </span>lithon.py tests/factorial.scm
+</pre>
+</div>
+
+
+<p>We now have a compiled version of the code in a .py file under the same directory:</p>
+
+<div class="highlight">
+<pre><span class="k">def</span> <span class="nf">factorial_rec</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mi">1</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">factorial_rec</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">factorial_iter</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+  <span class="k">return</span> <span class="nb">reduce</span><span class="p">((</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">),</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="k">print</span> <span class="nb">map</span><span class="p">(</span><span class="n">factorial_rec</span><span class="p">,</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">11</span><span class="p">))</span>
+<span class="k">print</span> <span class="nb">map</span><span class="p">(</span><span class="n">factorial_iter</span><span class="p">,</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
+</pre>
+</div>
+
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/pheuter">pheuter</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
