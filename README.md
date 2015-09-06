@@ -1,6 +1,6 @@
 # Lithon
 
-![Lithon Logo](http://f.cl.ly/items/211f3ba89e1946ffe703/lithon.png)
+![Lithon Logo](https://cloud.githubusercontent.com/assets/92698/9705820/dc58adc4-549f-11e5-8006-22d568472d5a.png)
 
 A toy compiler that translates from a small subset of Scheme into Python.
 
